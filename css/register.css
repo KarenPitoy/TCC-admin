@@ -1,0 +1,267 @@
+/* Reset defaults */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+
+  /* Background image */
+  background: url("../images/background.jpg") no-repeat center center/cover;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Light green overlay (opacity layer) */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 3, 2, 0.321); /* light green tint */
+  z-index: -1;
+}
+
+/* Header logo */
+header {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  z-index: 2;
+}
+
+.attendify-logo {
+  height: 40px; /* smaller logo */
+}
+
+/* Main glass container */
+.main-glass {
+  display: flex;
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 950px;
+  width: 95%;
+  min-height: 60vh;
+  background: rgba(255, 255, 255, 0.12); /* light glass */
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255,255,255,0.25);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  gap: 25px;
+  z-index: 2;
+}
+
+/* Left side */
+.left-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+}
+
+.left-side .school-logo {
+  height: 120px;
+  margin-bottom: 25px;
+  max-width: 100%;
+}
+
+.left-side h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #e9fbee;
+}
+
+/* Divider */
+.divider {
+  width: 1px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 1px;
+}
+
+/* Right side */
+.right-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-frame {
+  background: rgba(0,0,0,0.25);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.login-frame h2 {
+  color: #ffffff;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Upload photo section */
+.upload-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.upload-photo label {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+#photo-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+  border: 2px solid rgba(255,255,255,0.5);
+}
+
+#profile-photo {
+  display: none;
+}
+
+/* Input group with icons */
+.input-group {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ffffff;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 12px 12px 45px; 
+  border: none;
+  border-radius: 30px;
+  outline: none;
+  background: rgba(255,255,255,0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.input-group input::placeholder {
+  color: rgba(255,255,255,0.7);
+}
+
+/* Options row */
+.options-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.options-row a {
+  color: #2ecc71;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.options-row a:hover {
+  text-decoration: underline;
+}
+
+/* Register button */
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 30px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+  background: linear-gradient(90deg, rgba(46,204,113,0.6), rgba(39,174,96,0.7));
+  border: 1px solid rgba(255,255,255,0.25);
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background: linear-gradient(90deg, rgba(46,204,113,0.9), rgba(39,174,96,0.9));
+}
+
+/* Signup text */
+.signup-text {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.signup-text a {
+  color: #2ecc71;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.signup-text a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .main-glass {
+    flex-direction: column;
+    min-height: 70vh;
+    gap: 50px;
+  }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+  }
+
+  .left-side .school-logo {
+    height: 100px;
+  }
+
+  .left-side h2 {
+    font-size: 20px;
+  }
+}
+
+/* Prevent white/yellow autofill background */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px rgba(255,255,255,0.15) inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,0.25);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Optional: keep the same style on focus */
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px rgba(255,255,255,0.15) inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
