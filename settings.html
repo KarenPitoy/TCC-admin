@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<style>
+/* === GENERAL STYLES === */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #F2F3F5;
+  color: #060607;
+  margin: 0;
+  padding: 0;
+}
+
+/* === MAIN LAYOUT === */
+main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 40px 0;
+}
+
+.container {
+  width: 100%;
+  max-width: 640px;
+  padding: 0 24px;
+}
+
+/* === HEADER === */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.esc-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6D6F78;
+  font-size: 0.75rem;
+  font-weight: bold;
+  gap: 4px;
+  padding: 0;
+}
+
+.esc-btn:hover {
+  color: #060607;
+}
+
+.esc-btn .material-icons {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #6D6F78;
+  border-radius: 50%;
+  font-size: 16px;
+}
+
+/* === PROFILE CARD === */
+.profile-card {
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  position: relative;
+  font-size: 0.875rem;
+  overflow: hidden;
+}
+
+.profile-card .cover {
+  height: 80px;
+  background-color: #D1D5DB; /* gray-300 */
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  position: relative;
+}
+
+.profile-card .avatar {
+  position: absolute;
+  bottom: -48px;
+  left: 24px;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 4px solid #FFFFFF;
+}
+
+.profile-card .card-body {
+  padding: 64px 24px 24px 24px;
+}
+
+/* === HEADER ROW === */
+.profile-card .header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.profile-card .header-row h2 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.profile-card .header-row p {
+  font-size: 0.75rem;
+  color: #4E5058;
+  margin: 2px 0 0 0;
+}
+
+.edit-btn {
+  background-color: #16a34a;
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  background-color: #15803d;
+}
+
+/* === EDIT FORM === */
+.edit-form {
+  display: none;
+  gap: 16px;
+}
+
+.edit-form label {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #6D6F78;
+  margin-bottom: 4px;
+}
+
+.edit-form input {
+  width: 100%;
+  border: 1px solid #E3E5E8;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+}
+
+.edit-form .button-row {
+  display: flex;
+  gap: 16px;
+}
+
+.edit-form button {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: #E5E7EB;
+  color: #060607;
+}
+
+.cancel-btn:hover {
+  background-color: #D1D5DB;
+}
+
+.save-btn {
+  background-color: #16a34a;
+  color: #FFFFFF;
+}
+
+.save-btn:hover {
+  background-color: #15803d;
+}
+
+/* === PROFILE INFO PANEL === */
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-row p:first-child {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #6D6F78;
+  margin: 0;
+}
+
+.info-row p:last-child {
+  font-size: 0.875rem;
+  margin: 4px 0 0 0;
+}
+
+.info-row button {
+  background-color: #E5E7EB;
+  color: #060607;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.info-row button:hover {
+  background-color: #D1D5DB;
+}
+
+/* === PASSWORD SECTION === */
+.password-section {
+  margin-top: 24px;
+}
+
+.password-section h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.password-section button {
+  background-color: #16a34a;
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.password-section button:hover {
+  background-color: #15803d;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 600px) {
+  .profile-card .card-body {
+    padding: 64px 16px 16px 16px;
+  }
+
+  .edit-btn, .save-btn, .cancel-btn, .info-row button, .password-section button {
+    font-size: 0.7rem;
+    padding: 6px 12px;
+  }
+
+  .profile-card .avatar {
+    width: 80px;
+    height: 80px;
+    bottom: -40px;
+  }
+}
+</style>
+</head>
+<body>
+<main>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <h1>My Account</h1>
+      <button id="escBtn" class="esc-btn">
+        <span class="material-icons">close</span>
+        ESC
+      </button>
+    </div>
+
+    <!-- Profile Card -->
+  <div class="profile-card"> 
+    <div class="cover"> <img id="userProfileImage" src="images/default-profile.png" alt="Profile" class="avatar"/>
+     <input type="file" id="profileUpload" accept="image/*" style="display:none"/>
+      </div>
+
+      <div class="card-body">
+
+        <!-- Header Row -->
+        <div class="header-row">
+          <div id="userInfo" class="user-info">
+            <h4 id="userInfoName">Loading...</h4>
+            <p id="userInfoEmail">Loading...</p>
+          </div>
+          <button id="editProfileBtn" class="edit-btn">Edit Profile</button>
+        </div>
+
+       <!-- Editable Form -->
+<div id="editProfileForm" class="edit-form" style="display:none;">
+  <div>
+    <label for="userName">Full Name</label>
+    <input type="text" id="userName" value="John Doe" autocomplete="name"/>
+  </div>
+  <div>
+    <label for="userEmail">Email</label>
+    <input type="email" id="userEmail" value="john@example.com" autocomplete="email"/>
+  </div>
+  <div class="button-row">
+    <button id="cancelBtn" class="cancel-btn" type="button">Cancel</button>
+    <button id="saveBtn" class="save-btn" type="button">Save</button>
+  </div>
+</div>
+
+        <!-- Change Password -->
+        <div class="password-section">
+          <h2>Password & Authentication</h2>
+          <button>Change Password</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+
+
+</script>
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Custom Script -->
+<script src="js/login.js"></script>
+<script src="js/script.js"></script>
+<script type="module">
+const SUPABASE_URL = "https://zovmjxdfmzhxetopmpyp.supabase.co";
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpvdm1qeGRmbXpoeGV0b3BtcHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwMDI3NzcsImV4cCI6MjA3NTU3ODc3N30.SNyLbhhUi6HRmTW4ThoJBYImdwcKuSykcgRzHg0TYxM";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+console.log("🚀 Supabase client initialized");
+const editBtn = document.getElementById('editProfileBtn');
+const form = document.getElementById('editProfileForm');
+const cancelBtn = document.getElementById('cancelBtn');
+const saveBtn = document.getElementById('saveBtn');
+
+const adminId = 1; // Replace with dynamic ID if needed
+
+if (editBtn && form && cancelBtn && saveBtn) {
+  // Show form
+  editBtn.addEventListener('click', () => {
+    form.style.display = 'block';
+    editBtn.style.display = 'none';
+  });
+
+  // Cancel button
+  cancelBtn.addEventListener('click', () => {
+    form.style.display = 'none';
+    editBtn.style.display = 'inline-block';
+  });
+
+  // Save button
+saveBtn.addEventListener('click', async (e) => {
+  e.preventDefault(); // Prevent form submission / page reload
+
+  const fullName = document.getElementById('userName').value.trim();
+  const email = document.getElementById('userEmail').value.trim();
+
+  if (!fullName || !email) {
+    alert("Please fill in both Full Name and Email.");
+    return;
+  }
+
+  try {
+    const { error } = await supabase
+      .from('admin')
+      .update({ name: fullName, email: email })
+      .eq('id', adminId);
+
+    if (error) throw error;
+
+    console.log("✅ Admin updated:", { fullName, email });
+
+    // Update localStorage with new info
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    user.name = fullName;
+    user.email = email;
+    localStorage.setItem('user', JSON.stringify(user));
+
+    // Reload page to reflect updated info
+    window.location.reload();
+
+  } catch (err) {
+    console.error("⚠️ Failed to update admin:", err);
+    alert("Failed to update profile.");
+  }
+});
+
+} else {
+  console.warn("⚠️ Missing one or more elements — check HTML IDs");
+}
+
+// ESC button
+if (escBtn) {
+  escBtn.addEventListener('click', () => {
+    console.log("🧭 ESC button clicked → Going back");
+    window.history.back();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === "Escape") {
+      console.log("⌨️ ESC key pressed → Going back");
+      window.history.back();
+    }
+  });
+}
+
+//===========================
+// SETTINGS SECTION
+//===========================
+
+async function loadAdminProfile(adminId = 1) {
+  const img = document.getElementById("userProfileImage");
+  const profileUpload = document.getElementById("profileUpload");
+  const defaultIcon = "images/default-profile.png";
+
+  function setImage(url) {
+    // Append timestamp to bust cache
+    img.src = url ? `${url}?t=${Date.now()}` : defaultIcon;
+  }
+
+  async function fetchProfile() {
+    try {
+      const { data: adminData, error } = await supabase
+        .from("admin")
+        .select("name, picture")
+        .eq("id", adminId)
+        .single();
+      if (error) throw error;
+
+      console.log("✅ Admin data fetched:", adminData);
+      setImage(adminData?.picture);
+      return adminData;
+    } catch (err) {
+      console.error("⚠️ Failed to fetch profile:", err);
+      setImage(defaultIcon);
+      return null;
+    }
+  }
+
+  let adminData = await fetchProfile();
+
+  // Subscribe to real-time updates
+  supabase
+    .channel("public:admin")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "admin", filter: `id=eq.${adminId}` },
+      (payload) => {
+        console.log("🔔 Admin profile updated:", payload.new);
+        setImage(payload.new.picture);
+      }
+    )
+    .subscribe();
+
+  // Upload new picture
+  img.addEventListener("click", () => profileUpload.click());
+
+  profileUpload.addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+    if (!file || !adminData) return;
+
+    const safeName = adminData.name.replace(/\s+/g, "-").toLowerCase();
+    const fileName = `${safeName}.png`;
+    console.log("📤 Uploading file as:", fileName);
+
+    try {
+      // Upload to storage (overwrite old)
+      const { error: uploadError } = await supabase.storage
+        .from("profiles/admin")
+        .upload(fileName, file, { upsert: true });
+      if (uploadError) throw uploadError;
+      console.log("✅ File uploaded");
+
+      // Get public URL
+      const { data: urlData, error: urlError } = await supabase.storage
+        .from("profiles/admin")
+        .getPublicUrl(fileName);
+      if (urlError || !urlData?.publicUrl) throw urlError;
+
+      const publicUrl = urlData.publicUrl;
+
+      // Update table with public URL (triggers real-time subscription)
+      const { error: updateError } = await supabase
+        .from("admin")
+        .update({ picture: publicUrl })
+        .eq("id", adminId);
+      if (updateError) throw updateError;
+
+      console.log("✅ Admin table updated, UI should refresh automatically");
+    } catch (err) {
+      console.error("⚠️ Failed to upload profile picture:", err);
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadAdminProfile();
+});
+</script>
+
+</body>
+</html>

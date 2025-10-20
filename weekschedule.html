@@ -1,0 +1,253 @@
+<!DOCTYPE html>  
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week Schedule</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          primary: "#4F46E5",
+          greenHighlight: "#22c55e",
+          "background-light": "#FFFFFF",
+          "background-dark": "#111827",
+          "gray-light": "#F3F4F6",
+          "gray-dark": "#1F2937",
+        },
+        fontFamily: {
+          display: ["Inter", "sans-serif"],
+        },
+      },
+    },
+  };
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<style>
+  body { overflow: hidden; font-family: Inter, sans-serif; }
+  .scroll-hide::-webkit-scrollbar { display: none; }
+  .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  thead th { position: sticky; top: 0; background-color: inherit; z-index: 10; }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100">
+
+<div class="max-w-6xl mx-auto my-2 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg h-[90vh] flex flex-col">
+
+  <!-- Week Label & Navigation -->
+  <div class="flex items-center justify-between mb-4 shrink-0">
+    <h1 id="weekLabel" class="text-xl font-bold"></h1>
+    <div class="flex items-center space-x-3">
+      <button id="prevWeek" class="flex items-center px-3 py-1 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-light dark:hover:bg-gray-dark">
+        <span class="material-icons">chevron_left</span> Prev
+      </button>
+      <span id="todayWeek" class="text-greenHighlight font-semibold cursor-pointer">Today</span>
+      <button id="nextWeek" class="flex items-center px-3 py-1 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-light dark:hover:bg-gray-dark">
+        Next <span class="material-icons">chevron_right</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Week Table -->
+  <div class="flex-1 overflow-y-auto scroll-hide border rounded-lg">
+    <table class="min-w-full border-collapse border border-gray-200 dark:border-gray-700">
+      <thead class="bg-gray-100 dark:bg-gray-700">
+        <tr>
+          <th class="border-r border-gray-200 dark:border-gray-600 text-xs p-2 sticky top-0 z-20 bg-gray-100 dark:bg-gray-700">Time</th>
+          <th class="border-r border-gray-200 dark:border-gray-600 text-xs p-2 sticky top-0 z-20 bg-gray-100 dark:bg-gray-700" id="sunHeader"></th>
+          <th class="border-r border-gray-200 dark:border-gray-600 text-xs p-2 sticky top-0 z-20 bg-gray-100 dark:bg-gray-700" id="monHeader"></th>
+          <th class="border-r border-gray-200 dark:border-gray-600 text-xs p-2 sticky top-0 z-20 bg-gray-100 dark:bg-gray-700" id="tueHeader"></th>
+          <th class="border-r border-gray-200 dark:border-gray-600 text-xs p-2 sticky top-0 z-20 bg-gray-100 dark:bg-gray-700" id="wedHeader"></th>
+          <th class="border-r border-gray-200 dark:border-gray-600 text-xs p-2 sticky top-0 z-20 bg-gray-100 dark:bg-gray-700" id="thuHeader"></th>
+          <th class="border-r border-gray-200 dark:border-gray-600 text-xs p-2 sticky top-0 z-20 bg-gray-100 dark:bg-gray-700" id="friHeader"></th>
+          <th class="text-xs p-2 sticky top-0 z-20 bg-gray-100 dark:bg-gray-700" id="satHeader"></th>
+        </tr>
+      </thead>
+      <tbody id="weekTableBody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://zovmjxdfmzhxetopmpyp.supabase.co";
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpvdm1qeGRmbXpoeGV0b3BtcHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwMDI3NzcsImV4cCI6MjA3NTU3ODc3N30.SNyLbhhUi6HRmTW4ThoJBYImdwcKuSykcgRzHg0TYxM";
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
+
+<script>
+const weekTableBody = document.getElementById("weekTableBody");
+const dayHeaders = ["sunHeader","monHeader","tueHeader","wedHeader","thuHeader","friHeader","satHeader"];
+let today = new Date();
+let currentWeekStart = new Date(today);
+currentWeekStart.setDate(today.getDate() - today.getDay());
+const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+let weekEvents = {}; // store Supabase data here
+
+// ==============================
+// 🗓️ LOAD EVENTS FROM SUPABASE
+// ==============================
+async function loadWeekEvents() {
+  try {
+    const { data, error } = await supabaseClient.from("event").select("*");
+    if (error) throw error;
+    weekEvents = {};
+
+    data.forEach(ev => {
+      const start = new Date(ev.Start);
+      const end = new Date(ev.End);
+      let current = new Date(start);
+
+      while (current <= end) {
+        const key = formatDate(current);
+        if (!weekEvents[key]) weekEvents[key] = [];
+        weekEvents[key].push(ev);
+        current.setDate(current.getDate() + 1);
+      }
+    });
+
+    renderWeekTable(); // render after loading
+  } catch (err) {
+    console.error("❌ Failed to load events:", err.message);
+  }
+}
+
+// ==============================
+// 📅 HELPER FUNCTIONS
+// ==============================
+function formatDate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function getWeekDates(startDate) {
+  const week = [];
+  const d = new Date(startDate);
+  for (let i = 0; i < 7; i++) {
+    week.push(new Date(d));
+    d.setDate(d.getDate() + 1);
+  }
+  return week;
+}
+
+// ==============================
+// 🗓️ RENDER WEEK TABLE
+// ==============================
+function renderWeekTable() {
+  weekTableBody.innerHTML = "";
+
+  const weekDates = getWeekDates(currentWeekStart);
+
+  // update header
+  for (let i = 0; i < 7; i++) {
+    const header = document.getElementById(dayHeaders[i]);
+    let dayNum = weekDates[i].getDate();
+    let dayName = weekDates[i].toLocaleString("en-US", { weekday: "short" });
+    header.innerHTML = `<span class="mr-1">${dayNum}</span> ${dayName}`;
+    if (weekDates[i].toDateString() === today.toDateString()) {
+      header.innerHTML = `<span class="mr-1 bg-greenHighlight text-white rounded-full h-4 w-4 inline-flex items-center justify-center text-[10px]">${dayNum}</span> ${dayName}`;
+    }
+  }
+
+  // render 24 hours
+  const hours = [...Array(24).keys()];
+  for (let h of hours) {
+    const tr = document.createElement("tr");
+
+    const tdTime = document.createElement("td");
+    tdTime.className = "border-t border-gray-200 dark:border-gray-700 text-xs p-2";
+    tdTime.textContent = h === 0 ? "12 AM" : h < 12 ? `${h} AM` : h === 12 ? "12 PM" : `${h - 12} PM`;
+    tr.appendChild(tdTime);
+
+    // columns for 7 days
+    for (let d = 0; d < 7; d++) {
+      const td = document.createElement("td");
+      td.className = "border-t border-l border-gray-200 dark:border-gray-700 text-xs p-2 h-10 relative";
+
+      const dayKey = formatDate(weekDates[d]);
+      const events = weekEvents[dayKey] || [];
+
+      // filter and show morning & afternoon times
+     events.forEach(ev => {
+  // Helper function: convert "HH:MM:SS" → "hh:mm AM/PM"
+  const formatTime = (timeStr) => {
+    if (!timeStr) return "";
+    const [hour, minute] = timeStr.split(":");
+    let h = parseInt(hour);
+    const ampm = h >= 12 ? "PM" : "AM";
+    h = h % 12 || 12; // Convert 0 → 12 for 12hr format
+    return `${h}:${minute} ${ampm}`;
+  };
+
+  if (ev.MorningIn && parseInt(ev.MorningIn.split(":")[0]) === h) {
+    td.innerHTML += `<div class="bg-green-500 text-white rounded px-1 text-[10px] mb-1">Time - In (${formatTime(ev.MorningIn)})</div>`;
+  }
+  if (ev.MorningOut && parseInt(ev.MorningOut.split(":")[0]) === h) {
+    td.innerHTML += `<div class="bg-yellow-500 text-white rounded px-1 text-[10px] mb-1">Time - Out (${formatTime(ev.MorningOut)})</div>`;
+  }
+  if (ev.AfternoonIn && parseInt(ev.AfternoonIn.split(":")[0]) === h) {
+    td.innerHTML += `<div class="bg-blue-500 text-white rounded px-1 text-[10px] mb-1">Time - In (${formatTime(ev.AfternoonIn)})</div>`;
+  }
+  if (ev.AfternoonOut && parseInt(ev.AfternoonOut.split(":")[0]) === h) {
+    td.innerHTML += `<div class="bg-red-500 text-white rounded px-1 text-[10px] mb-1">Time - Out (${formatTime(ev.AfternoonOut)})</div>`;
+  }
+});
+
+
+      tr.appendChild(td);
+    }
+
+    weekTableBody.appendChild(tr);
+  }
+
+  updateWeekLabel();
+}
+
+// ==============================
+// 🗓️ NAVIGATION
+// ==============================
+function updateWeekLabel() {
+  const end = new Date(currentWeekStart);
+  end.setDate(end.getDate() + 6);
+  document.getElementById("weekLabel").textContent =
+    `${months[currentWeekStart.getMonth()]} ${currentWeekStart.getDate()} - ${months[end.getMonth()]} ${end.getDate()}, ${end.getFullYear()}`;
+}
+
+document.getElementById("prevWeek").onclick = () => {
+  currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+  renderWeekTable();
+};
+
+document.getElementById("nextWeek").onclick = () => {
+  currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+  renderWeekTable();
+};
+
+document.getElementById("todayWeek").onclick = () => {
+  today = new Date();
+  currentWeekStart = new Date(today);
+  currentWeekStart.setDate(today.getDate() - today.getDay());
+  renderWeekTable();
+};
+
+// ==============================
+// 🚀 INIT
+// ==============================
+document.addEventListener("DOMContentLoaded", () => {
+  loadWeekEvents();
+});
+</script>
+
+</body>
+</html>

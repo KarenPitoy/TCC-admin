@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendify - Login / Register</title>
+  <link rel="stylesheet" href="css/login.css"> <!-- Single combined CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <!-- Header with Attendify logo top-left -->
+<!-- Header with Attendify logo top-left -->
+<header>
+  <a href="#" class="logo">
+    <img src="images/attendify-logo.png" alt="Attendify Logo" class="attendify-logo">
+    <span>Attendify</span>
+  </a>
+</header>
+
+
+  <!-- Main glass container -->
+  <div class="main-glass">
+    <!-- Left side: school logo + tagline -->
+    <div class="left-side">
+      <img src="images/school-logo.png" alt="School Logo" class="school-logo">
+      <h2>Be a Boholano Achiever</h2>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider"></div>
+
+    <!-- Right side: Forms -->
+    <div class="right-side">
+      <!-- Login Form -->
+      <div class="login-frame" id="login-section">
+        <h2>Login</h2>
+        <form action="header-sidebar.html" method="get">
+          <div class="input-group">
+            <span class="input-icon"><i class="fas fa-envelope"></i></span>
+            <input type="email" id="emailInput" name="email" placeholder="Email" required>
+          </div>
+          <div class="input-group">
+            <span class="input-icon"><i class="fas fa-lock"></i></span>
+            <input type="password" id="passwordInput" name="password" placeholder="Password" required>
+          </div>
+          <div class="options-row">
+            <label class="remember-me" for="remember">
+              <input type="checkbox" id="remember"> Remember Me
+            </label>
+            <a href="#" class="forgot-password">Forgot Password?</a>
+          </div>
+          <button type="submit">Login</button>
+        </form>
+      </div>
+
+
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Custom Script -->
+<script src="js/login.js"></script>
+
+</body>
+</html>

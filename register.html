@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Attendify - Register</title>
+  <link rel="stylesheet" href="css/register.css">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <!-- Header with Attendify logo -->
+  <header>
+    <a href="#" class="logo">
+      <img src="images/attendify-logo.png" alt="Attendify Logo" class="attendify-logo">
+    </a>
+  </header>
+
+  <!-- Main glass container -->
+  <div class="main-glass">
+    <!-- Left side: school logo + tagline -->
+    <div class="left-side">
+      <img src="images/school-logo.png" alt="School Logo" class="school-logo">
+      <h2>Be a Boholano Achiever</h2>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider"></div>
+
+    <!-- Right side: registration form -->
+    <div class="right-side">
+      <div class="login-frame">
+        <h2>Register</h2>
+        <form>
+          <!-- Upload photo -->
+          <div class="upload-photo">
+            <label for="profile-photo">
+              <img src="images/default-avatar.png" alt="Profile Preview" id="photo-preview">
+              <span>Upload Photo</span>
+            </label>
+            <input type="file" id="profile-photo" accept="image/*" onchange="previewPhoto(event)">
+          </div>
+
+          <!-- Name input with icon -->
+          <div class="input-group">
+            <span class="input-icon"><i class="fas fa-user"></i></span>
+            <input type="text" id="name" placeholder="Full Name" required>
+          </div>
+
+          <!-- Email input with icon -->
+          <div class="input-group">
+            <span class="input-icon"><i class="fas fa-envelope"></i></span>
+            <input type="email" id="email" placeholder="Email" required>
+          </div>
+
+          <!-- Password input with icon -->
+          <div class="input-group">
+            <span class="input-icon"><i class="fas fa-lock"></i></span>
+            <input type="password" id="password" placeholder="Password" required>
+          </div>
+
+          <!-- Confirm Password input with icon -->
+          <div class="input-group">
+            <span class="input-icon"><i class="fas fa-lock"></i></span>
+            <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+          </div>
+
+          <!-- Terms checkbox -->
+          <div class="options-row">
+            <label class="remember-me">
+              <input type="checkbox" required> I agree to the <a href="#">Terms & Conditions</a>
+            </label>
+          </div>
+
+          <button type="submit">Register</button>
+        </form>
+
+        <p class="signup-text">
+          Already have an account? <a href="index.html">Login</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Preview uploaded photo
+    function previewPhoto(event) {
+      const reader = new FileReader();
+      reader.onload = function(){
+        const output = document.getElementById('photo-preview');
+        output.src = reader.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  </script>
+</body>
+</html>

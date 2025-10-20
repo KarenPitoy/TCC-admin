@@ -1,0 +1,144 @@
+<!DOCTYPE html>  
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Schedule</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          primary: "#4F46E5",
+          greenHighlight: "#22c55e",
+          "background-light": "#FFFFFF",
+          "background-dark": "#111827",
+          "gray-light": "#F3F4F6",
+          "gray-dark": "#1F2937",
+        },
+        fontFamily: {
+          display: ["Inter", "sans-serif"],
+        },
+      },
+    },
+  };
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<style>
+  body { overflow: hidden; font-family: Inter, sans-serif; }
+  .scroll-hide::-webkit-scrollbar { display: none; }
+  .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  iframe { border: none; width: 100%; height: 100%; }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100">
+
+<div class="max-w-6xl mx-auto my-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg h-[90vh] flex flex-col">
+
+  <!-- Week / Month Toggle -->
+  <div class="flex justify-center mb-4 shrink-0">
+    <div class="flex rounded-lg shadow-md bg-gray-light dark:bg-gray-dark p-1 space-x-2">
+      <button id="weekBtn" class="px-6 py-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition">Week</button>
+      <button id="monthBtn" class="px-6 py-2 rounded-lg bg-greenHighlight text-white shadow transition">Month</button>
+    </div>
+  </div>
+
+  <!-- Schedule iframe -->
+  <div class="flex-1 overflow-hidden relative">
+    <iframe id="scheduleFrame" src="monthschedule.html"></iframe>
+
+    <!-- Fullscreen Event Modal -->
+    <div id="eventModal" class="fixed inset-0 bg-black/50 hidden justify-center items-center z-50">
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-3 w-96 h-[600px] overflow-y-auto text-sm">
+        <h2 id="eventModalTitle" class="font-bold text-base mb-2">Add Event</h2>
+        <form id="eventForm">
+          <label class="block font-medium text-xs mb-1">Event Name</label>
+          <input type="text" id="eventName" class="w-full p-1 mb-2 rounded border border-gray-300 dark:border-gray-600 text-xs"/>
+          <label class="block font-medium text-xs mb-1">Event Details</label>
+          <textarea id="eventDetails" rows="3" class="w-full p-1 mb-2 rounded border border-gray-300 dark:border-gray-600 text-xs"></textarea>
+          <label class="block font-medium text-xs mb-1">Start</label>
+          <input type="datetime-local" id="eventStart" class="w-full p-1 mb-2 rounded border border-gray-300 dark:border-gray-600 text-xs"/>
+          <label class="block font-medium text-xs mb-1">End</label>
+          <input type="datetime-local" id="eventEnd" class="w-full p-1 mb-2 rounded border border-gray-300 dark:border-gray-600 text-xs"/>
+          <label class="block font-medium text-xs mb-1">Organizer</label>
+          <input type="text" id="eventOrganizer" class="w-full p-1 mb-2 rounded border border-gray-300 dark:border-gray-600 text-xs"/>
+          <div class="flex justify-end gap-2 mt-2">
+            <button type="button" id="closeModal" class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-xs">Cancel</button>
+            <button type="submit" class="px-3 py-1 rounded bg-greenHighlight text-white text-xs">Save</button>
+            <button type="button" id="deleteEvent" class="px-3 py-1 rounded bg-red-500 text-white text-xs">Delete</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const iframe = document.getElementById("scheduleFrame");
+const weekBtn = document.getElementById("weekBtn");
+const monthBtn = document.getElementById("monthBtn");
+const eventModal = document.getElementById("eventModal");
+const closeModal = document.getElementById("closeModal");
+const deleteEventBtn = document.getElementById("deleteEvent");
+let currentEvents = [];
+let currentKey = "";
+
+// Toggle buttons
+weekBtn.onclick = ()=>{ iframe.src = "weekschedule.html"; weekBtn.classList.add("bg-greenHighlight","text-white","shadow"); monthBtn.classList.remove("bg-greenHighlight","text-white","shadow"); };
+monthBtn.onclick = ()=>{ iframe.src = "monthschedule.html"; monthBtn.classList.add("bg-greenHighlight","text-white","shadow"); weekBtn.classList.remove("bg-greenHighlight","text-white","shadow"); };
+
+// Listen messages from iframe
+window.addEventListener("message", (e)=>{
+  const data = e.data;
+  if(data.type==='openEventModal'){
+    currentKey = data.date;
+    currentEvents = data.events || [];
+    document.getElementById("eventForm").reset();
+
+    if(currentEvents[0]){
+      const ev = currentEvents[0]; // Show first event for editing
+      document.getElementById("eventName").value = ev.name;
+      document.getElementById("eventDetails").value = ev.details;
+      document.getElementById("eventStart").value = ev.start;
+      document.getElementById("eventEnd").value = ev.end;
+      document.getElementById("eventOrganizer").value = ev.organizer;
+    }
+
+    eventModal.classList.remove("hidden");
+    eventModal.classList.add("flex");
+  }
+});
+
+// Close modal
+closeModal.onclick = ()=>{ eventModal.classList.add("hidden"); eventModal.classList.remove("flex"); };
+
+// Save event
+document.getElementById("eventForm").onsubmit = (e)=>{
+  e.preventDefault();
+  const name = document.getElementById("eventName").value;
+  const details = document.getElementById("eventDetails").value;
+  const start = document.getElementById("eventStart").value;
+  const end = document.getElementById("eventEnd").value;
+  const organizer = document.getElementById("eventOrganizer").value;
+
+  // Send back to iframe
+  iframe.contentWindow.postMessage({type:'saveEvent', key: currentKey, event:{name,details,start,end,organizer}}, '*');
+  eventModal.classList.add("hidden");
+  eventModal.classList.remove("flex");
+};
+
+// Delete event
+deleteEventBtn.onclick = ()=>{
+  iframe.contentWindow.postMessage({type:'deleteEvent', key: currentKey}, '*');
+  eventModal.classList.add("hidden");
+  eventModal.classList.remove("flex");
+};
+</script>
+
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Month Schedule</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<style>
+  body { font-family: Inter, sans-serif; overflow: hidden; }
+  .scroll-hide { overflow-x: hidden; overflow-y: hidden; -ms-overflow-style: none; scrollbar-width: none; }
+  .scroll-hide::-webkit-scrollbar { display: none; }
+
+  /* Modal */
+  #eventModal { display: none; position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 50; }
+  #eventModalContent { 
+    background-color: white; 
+    border-radius: 12px; 
+    padding: 1.5rem; 
+    width: 320px; 
+    max-height: 80vh; 
+    overflow-y: auto; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2); 
+    display: flex; 
+    flex-direction: column; 
+    gap: 0.5rem; 
+  }
+  #eventModalContent label { margin-bottom: 0.25rem; font-size: 0.8rem; }
+  #eventModalContent input, #eventModalContent textarea { 
+    padding: 0.4rem; 
+    border-radius: 6px; 
+    border: 1px solid #d1d5db; 
+    font-size: 0.8rem; 
+  }
+  #eventModalContent textarea { resize: none; }
+  #eventModalContent button { font-size: 0.75rem; padding: 0.3rem 0.5rem; }
+#calendarDays {
+  max-height: calc(90vh - 80px); /* subtract header height */
+  overflow: hidden;
+}
+
+
+.scroll-hide {
+  overflow: hidden;           /* remove scroll */
+  -ms-overflow-style: none;   /* IE and Edge */
+  scrollbar-width: none;      /* Firefox */
+}
+.scroll-hide::-webkit-scrollbar {
+  display: none;              /* Chrome, Safari */
+}
+
+.organizer-tag {
+    background-color: white;
+    color: #222;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    font-size: 12px;
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    animation: fadeIn 0.2s ease-in-out;
+  }
+  .organizer-tag span {
+    cursor: pointer;
+    font-weight: bold;
+    color: #16a34a;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+</style>
+</head>
+<body class="bg-white text-gray-900">
+
+<div class="max-w-6xl mx-auto my-2 p-4 bg-white rounded-lg h-[90vh] flex flex-col">
+  <div class="flex items-center justify-between mb-4 shrink-0">
+    <h1 id="monthYear" class="text-xl font-bold"></h1>
+    <div class="flex items-center space-x-3">
+      <button id="prevMonth" class="px-3 py-1 rounded-md text-gray-500 hover:bg-gray-100">Prev</button>
+      <span id="todayMonth" class="text-green-500 font-semibold cursor-pointer">Today</span>
+      <button id="nextMonth" class="px-3 py-1 rounded-md text-gray-500 hover:bg-gray-100">Next</button>
+    </div>
+  </div>
+  <div class="grid grid-cols-7 gap-1 text-center text-sm font-medium mb-1">
+    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+  </div>
+  <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center flex-1 scroll-hide"></div>
+</div>
+
+<!-- Event Modal -->
+<div id="eventModal">
+  <div id="eventModalContent">
+    <h2 id="eventModalTitle" class="font-bold text-base mb-2">Add Event</h2>
+
+    <form id="eventForm" class="flex flex-col gap-2">
+      <label>Event Name</label>
+      <input type="text" id="eventName" required />
+
+      <label>Event Details</label>
+      <textarea id="eventDetails" rows="3"></textarea>
+
+      <label>Start</label>
+      <input type="datetime-local" id="eventStart" required />
+
+      <label>End</label>
+      <input type="datetime-local" id="eventEnd" required />
+
+      <!-- 🕒 Morning Schedule -->
+      <div class="border-t border-gray-300 mt-3 pt-2">
+        <h3 class="font-semibold text-sm mb-1 text-gray-700">Morning Schedule</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="morningTimeIn" class="text-xs text-gray-600">Time In</label>
+            <input
+              type="time"
+              id="morningTimeIn"
+              class="w-full text-sm px-2 py-1 rounded border border-gray-300"
+            />
+          </div>
+          <div>
+            <label for="morningTimeOut" class="text-xs text-gray-600">Time Out</label>
+            <input
+              type="time"
+              id="morningTimeOut"
+              class="w-full text-sm px-2 py-1 rounded border border-gray-300"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- 🌇 Afternoon Schedule -->
+      <div class="border-t border-gray-300 mt-3 pt-2">
+        <h3 class="font-semibold text-sm mb-1 text-gray-700">Afternoon Schedule</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="afternoonTimeIn" class="text-xs text-gray-600">Time In</label>
+            <input
+              type="time"
+              id="afternoonTimeIn"
+              class="w-full text-sm px-2 py-1 rounded border border-gray-300"
+            />
+          </div>
+          <div>
+            <label for="afternoonTimeOut" class="text-xs text-gray-600">Time Out</label>
+            <input
+              type="time"
+              id="afternoonTimeOut"
+              class="w-full text-sm px-2 py-1 rounded border border-gray-300"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ Organizer Section (Tag-based) -->
+      <label class="mt-3">Organizers</label>
+      <div class="flex gap-2 items-center">
+        <input
+          type="text"
+          id="organizerInput"
+          placeholder="Type name or number"
+          class="flex-1 text-sm px-2 py-1 rounded border border-gray-300"
+        />
+        <button
+          type="button"
+          id="addOrganizerBtn"
+          class="w-6 h-6 flex items-center justify-center bg-green-500 text-white rounded-full text-xs font-bold shadow-md hover:bg-green-600"
+        >
+          +
+        </button>
+      </div>
+      <div id="organizerTags" class="flex flex-wrap gap-2 mt-2"></div>
+      <input type="hidden" id="eventOrganizer" />
+
+      <!-- Buttons -->
+      <div class="flex justify-between mt-3 items-center">
+        <div></div>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            id="closeModal"
+            class="px-3 py-1 rounded border border-gray-300 text-xs"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-3 py-1 rounded bg-green-500 text-white text-xs"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ==============================
+// 🔗 Initialize Supabase
+// ==============================
+const SUPABASE_URL = "https://zovmjxdfmzhxetopmpyp.supabase.co";
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpvdm1qeGRmbXpoeGV0b3BtcHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwMDI3NzcsImV4cCI6MjA3NTU3ODc3N30.SNyLbhhUi6HRmTW4ThoJBYImdwcKuSykcgRzHg0TYxM";
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+// ==============================
+// 📦 Load Events from Supabase
+// ==============================
+async function loadEventsFromSupabase() {
+  try {
+    const { data, error } = await supabaseClient.from("event").select("*");
+    if (error) throw error;
+
+    events = {};
+    data.forEach(ev => {
+      const start = new Date(ev.Start);
+      const end = new Date(ev.End);
+      let current = new Date(start);
+
+      while (current <= end) {
+        const key = formatDateLocal(current);
+        if (!events[key]) events[key] = [];
+        events[key].push({
+          id: ev.id,
+          name: ev.EventName,
+          details: ev.EventDetails,
+          start: ev.Start,
+          end: ev.End,
+          organizer: ev.Organizer,
+          morningIn: ev.MorningIn,
+          morningOut: ev.MorningOut,
+          afternoonIn: ev.AfternoonIn,
+          afternoonOut: ev.AfternoonOut
+        });
+        current.setDate(current.getDate() + 1);
+      }
+    });
+
+    renderCalendar(currentMonth, currentYear);
+  } catch (err) {
+    console.error("Failed to load events:", err.message);
+  }
+}
+
+// ==============================
+// 👥 Organizer Tag System
+// ==============================
+const organizerInput = document.getElementById("organizerInput");
+const organizerTags = document.getElementById("organizerTags");
+const organizerHidden = document.getElementById("eventOrganizer");
+let organizerList = [];
+
+document.getElementById("addOrganizerBtn").onclick = () => {
+  const name = organizerInput.value.trim();
+  if (!name) return;
+  if (!organizerList.includes(name)) organizerList.push(name);
+  organizerInput.value = "";
+  renderOrganizerTags();
+};
+organizerInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    document.getElementById("addOrganizerBtn").click();
+  }
+});
+function renderOrganizerTags() {
+  organizerTags.innerHTML = "";
+  organizerList.forEach((org, index) => {
+    const tag = document.createElement("div");
+    tag.className = "organizer-tag";
+    tag.innerHTML = `${org} <span title="Remove">×</span>`;
+    tag.querySelector("span").onclick = () => {
+      organizerList.splice(index, 1);
+      renderOrganizerTags();
+    };
+    organizerTags.appendChild(tag);
+  });
+  organizerHidden.value = organizerList.join(", ");
+}
+function loadOrganizers(orgString) {
+  organizerList = orgString ? orgString.split(",").map(o => o.trim()) : [];
+  renderOrganizerTags();
+}
+
+// ==============================
+// 🗓️ Calendar Setup
+// ==============================
+const calendarDays = document.getElementById("calendarDays");
+const monthYear = document.getElementById("monthYear");
+const eventModal = document.getElementById("eventModal");
+let today = new Date();
+let currentMonth = today.getMonth();
+let currentYear = today.getFullYear();
+const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+let events = {};
+let selectedDate = null;
+let editingEventId = null;
+
+// Helpers
+function formatDateLocal(date) {
+  const y = date.getFullYear(), m = String(date.getMonth()+1).padStart(2,'0'), d = String(date.getDate()).padStart(2,'0');
+  return `${y}-${m}-${d}`;
+}
+function isoToLocalDatetime(iso) {
+  const d = new Date(iso);
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0'),
+        h = String(d.getHours()).padStart(2,'0'), min = String(d.getMinutes()).padStart(2,'0');
+  return `${y}-${m}-${day}T${h}:${min}`;
+}
+
+// ==============================
+// 🏷 Event Modal Logic
+// ==============================
+function openEventModal(isEditing = false, eventData = null) {
+  document.getElementById("eventForm").reset();
+  organizerList = [];
+  renderOrganizerTags();
+
+  const startInput = document.getElementById("eventStart");
+  const endInput = document.getElementById("eventEnd");
+
+  const now = new Date();
+  const isoNow = now.toISOString().slice(0,16);
+
+  if (isEditing && eventData) {
+    editingEventId = eventData.id;
+
+    startInput.min = ""; // allow editing past start date
+    endInput.min = "";   // allow editing past end date
+
+    document.getElementById("eventName").value = eventData.name;
+    document.getElementById("eventDetails").value = eventData.details;
+    startInput.value = isoToLocalDatetime(eventData.start);
+    endInput.value = isoToLocalDatetime(eventData.end);
+    loadOrganizers(eventData.organizer);
+
+    document.getElementById("morningTimeIn").value = eventData.morningIn || "";
+    document.getElementById("morningTimeOut").value = eventData.morningOut || "";
+    document.getElementById("afternoonTimeIn").value = eventData.afternoonIn || "";
+    document.getElementById("afternoonTimeOut").value = eventData.afternoonOut || "";
+
+    // Disable only if event is fully done (end < now)
+    const isPastEvent = new Date(eventData.end) < now;
+    const fields = ["eventName","eventDetails","eventStart","eventEnd","morningTimeIn","morningTimeOut","afternoonTimeIn","afternoonTimeOut","organizerInput"];
+    fields.forEach(id => document.getElementById(id).disabled = isPastEvent);
+    document.querySelector("#eventForm button[type='submit']").style.display = isPastEvent ? "none" : "block";
+    document.getElementById("eventModalTitle").innerText = isPastEvent ? "🕒 Past Event (Read-Only)" : "✏️ Edit Event";
+
+  } else {
+    editingEventId = null;
+    startInput.min = isoNow;
+    endInput.min = isoNow;
+
+    const todayDate = formatDateLocal(selectedDate || now);
+    startInput.value = `${todayDate}T00:00`;
+    endInput.value = `${todayDate}T23:59`;
+    document.getElementById("eventModalTitle").innerText = "➕ Add Event";
+  }
+
+  eventModal.style.display = "flex";
+}
+
+// Close modal
+document.getElementById("closeModal").onclick = () => {
+  eventModal.style.display = "none";
+  editingEventId = null;
+};
+
+// ==============================
+// 📝 Save Event
+// ==============================
+document.getElementById("eventForm").onsubmit = async e => {
+  e.preventDefault();
+
+  const name = document.getElementById("eventName").value;
+  const details = document.getElementById("eventDetails").value;
+  const start = new Date(document.getElementById("eventStart").value);
+  const end = new Date(document.getElementById("eventEnd").value);
+  const organizer = document.getElementById("eventOrganizer").value;
+
+  const morningIn = document.getElementById("morningTimeIn").value || null;
+  const morningOut = document.getElementById("morningTimeOut").value || null;
+  const afternoonIn = document.getElementById("afternoonTimeIn").value || null;
+  const afternoonOut = document.getElementById("afternoonTimeOut").value || null;
+
+  if (!editingEventId) editingEventId = Date.now();
+
+  // Remove old copies
+  for (let key in events) events[key] = events[key].filter(ev => ev.id !== editingEventId);
+
+  // Add locally
+  let current = new Date(start);
+  while (current <= end) {
+    const key = formatDateLocal(current);
+    if (!events[key]) events[key] = [];
+    events[key].push({ id: editingEventId, name, details, start: start.toISOString(), end: end.toISOString(), organizer, morningIn, morningOut, afternoonIn, afternoonOut });
+    current.setDate(current.getDate() + 1);
+  }
+
+  // Supabase upsert
+  function normalizeTime(value) {
+    if (!value) return null;
+    const parts = value.split(":");
+    return parts.length >= 2 ? `${parts[0].padStart(2,"0")}:${parts[1].padStart(2,"0")}:00` : null;
+  }
+
+  const newEvent = { id: editingEventId, EventName: name, EventDetails: details, Start: start.toISOString(), End: end.toISOString(), Organizer: organizer, MorningIn: normalizeTime(morningIn), MorningOut: normalizeTime(morningOut), AfternoonIn: normalizeTime(afternoonIn), AfternoonOut: normalizeTime(afternoonOut) };
+
+  const { error } = await supabaseClient.from("event").upsert([newEvent], { onConflict: "id" });
+  if (error) return alert("Failed to save event!");
+
+  renderCalendar(currentMonth, currentYear);
+  eventModal.style.display = "none";
+  editingEventId = null;
+}
+
+// ==============================
+// 📅 Calendar Render
+// ==============================
+function renderCalendar(month, year) {
+  calendarDays.innerHTML = "";
+  monthYear.innerText = `${months[month]} ${year}`;
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month + 1, 0).getDate();
+
+  for (let i = 0; i < firstDay; i++) calendarDays.appendChild(document.createElement("div"));
+
+  for (let date = 1; date <= lastDate; date++) {
+    const dayDiv = document.createElement("div");
+    dayDiv.className = "h-24 relative rounded cursor-pointer text-sm p-1 group";
+    const dayKey = formatDateLocal(new Date(year, month, date));
+
+    dayDiv.innerHTML = `<span class="absolute top-1 left-1 text-xs ${date===today.getDate() && month===today.getMonth() && year===today.getFullYear() ? 'bg-green-500 text-white rounded-full h-6 w-6 flex items-center justify-center':''}">${date}</span>`;
+
+    const topRight = document.createElement("div");
+    topRight.className = "absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition";
+    dayDiv.appendChild(topRight);
+
+    if (events[dayKey] && events[dayKey].length > 0) {
+      events[dayKey].forEach(ev => {
+        const evDiv = document.createElement("div");
+        evDiv.className = "bg-green-500 text-white rounded px-1 mt-6 text-xs overflow-hidden whitespace-nowrap text-ellipsis cursor-pointer";
+        evDiv.textContent = ev.name;
+
+        const editBtn = document.createElement("span");
+        editBtn.className = "material-icons text-[14px] cursor-pointer text-white bg-green-500 rounded p-[1px] ml-1";
+        editBtn.textContent = "edit";
+        editBtn.title = "Edit";
+        editBtn.onclick = e => { e.stopPropagation(); openEventModal(true, ev); };
+
+        const deleteBtn = document.createElement("span");
+        deleteBtn.className = "material-icons text-[14px] cursor-pointer text-red-500 bg-white rounded p-[1px] ml-1";
+        deleteBtn.textContent = "delete";
+        deleteBtn.title = "Delete";
+        deleteBtn.onclick = async e => {
+          e.stopPropagation();
+          if (!confirm("Are you sure you want to delete this event?")) return;
+          for (let key in events) events[key] = events[key].filter(event => event.id !== ev.id);
+          renderCalendar(currentMonth, currentYear);
+          const { error } = await supabaseClient.from("event").delete().eq("id", ev.id);
+          if (error) console.error("Failed to delete from Supabase:", error);
+        };
+
+        topRight.appendChild(editBtn);
+        topRight.appendChild(deleteBtn);
+        dayDiv.appendChild(evDiv);
+      });
+    } else {
+      const addBtn = document.createElement("button");
+      addBtn.textContent = "+";
+      addBtn.className = "bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px]";
+      addBtn.onclick = e => {
+        e.stopPropagation();
+        selectedDate = new Date(year, month, date);
+
+        if (selectedDate < today) {
+    alert("⚠️ You cannot add events before today.");
+    return;
+  }
+
+
+        openEventModal(false);
+      };
+      topRight.appendChild(addBtn);
+    }
+
+    calendarDays.appendChild(dayDiv);
+  }
+}
+
+// Month navigation
+document.getElementById("prevMonth").onclick = () => { currentMonth--; if (currentMonth<0){currentMonth=11; currentYear--;} renderCalendar(currentMonth,currentYear); };
+document.getElementById("nextMonth").onclick = () => { currentMonth++; if (currentMonth>11){currentMonth=0; currentYear++;} renderCalendar(currentMonth,currentYear); };
+document.getElementById("todayMonth").onclick = () => { today = new Date(); currentMonth=today.getMonth(); currentYear=today.getFullYear(); renderCalendar(currentMonth,currentYear); };
+
+// Load on page load
+document.addEventListener("DOMContentLoaded", loadEventsFromSupabase);
+// ==============================
+// 🚫 Prevent adding events before today
+// ==============================
+
+// Set the minimum allowed date/time for event start & end
+function setMinDateTime() {
+  const now = new Date();
+  const isoNow = now.toISOString().slice(0, 16); // format: yyyy-MM-ddTHH:mm
+  document.getElementById("eventStart").min = isoNow;
+  document.getElementById("eventEnd").min = isoNow;
+}
+setMinDateTime();
+
+// Modify the Add (+) button behavior to block past dates
+const originalAddBtnHandler = (e) => {
+  e.stopPropagation();
+  selectedDate = new Date(year, month, date);
+  editingEventId = null;
+  document.getElementById("eventForm").reset();
+
+  // 🧠 Prevent adding events before today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (selectedDate < today) {
+    alert("⚠️ You cannot add events before today.");
+    return;
+  }
+
+  const todayDate = formatDateLocal(selectedDate);
+  document.getElementById("eventStart").value = `${todayDate}T00:00`;
+  document.getElementById("eventEnd").value = `${todayDate}T23:59`;
+  eventModal.style.display = "flex";
+};
+
+
+
+</script>
+</body>
+</html>

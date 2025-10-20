@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Attendify Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .inset-shadow { box-shadow: inset 0 4px 10px rgba(0,0,0,0.15); }
+  .shadow-deep { box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+  .event-card:hover { transform: translateY(-2px); transition: 0.2s; }
+</style>
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+
+<div class="min-h-screen w-full flex items-center justify-center px-4 py-4">
+  <main class="container mx-auto grid grid-cols-3 grid-rows-2 gap-6 max-w-6xl h-[calc(100vh-2rem)]">
+
+    <!-- Frame 1: Profile -->
+    <div class="col-span-1 row-span-1 bg-white rounded-2xl shadow-deep flex flex-col items-center justify-center relative overflow-hidden">
+    <svg class="absolute top-0 left-0 w-full h-full" viewBox="0 0 900 600" preserveAspectRatio="none">
+      <g transform="translate(900, 0)">
+        <path d="M0 486.7C-70 481.1 -140 475.5 -180.2 435.1C-220.4 394.8 -230.8 319.8 -277.9 277.9C-325 236 -408.8 227.1 -449.7 186.3C-490.6 145.5 -488.7 72.7 -486.7 0L0 0Z" fill="#e3e3e3"/>
+      </g>
+      <g transform="translate(0, 600)">
+        <path d="M0 -486.7C48.2 -439.9 96.4 -393 154.6 -373.2C212.8 -353.5 281 -360.9 334.5 -334.5C388 -308 426.8 -247.7 449.7 -186.3C472.6 -124.9 479.7 -62.4 486.7 0L0 0Z" fill="#e3e3e3"/>
+      </g>
+    </svg>
+
+   <div class="w-36 h-36 rounded-full inset-shadow flex items-center justify-center relative z-10 mb-2">
+  <img id="userProfileImage" src="images/default-profile.png" alt="Profile" class="w-36 h-36 rounded-full object-cover">
+</div>
+
+    <h2 id="userName" class="text-xl font-semibold text-gray-800 z-10">Loading...</h2>
+    <p id="userEmail" class="text-gray-500 text-sm z-10 mt-1">Loading...</p>
+    <p id="userId" class="text-gray-400 text-sm z-10 mt-1">Loading...</p>
+  </div>
+
+    <!-- Frame 2: Schedule -->
+    <div class="col-span-2 row-span-1 bg-white p-6 rounded-2xl shadow-deep flex h-full relative">
+      <div class="w-1/2 pr-4 flex flex-col">
+  <h3 class="text-lg font-semibold text-gray-700 mb-2">Today's Schedule</h3>
+  <div id="scheduleBox" class="bg-gray-100 p-4 rounded-lg flex flex-col gap-2">
+    <p class="text-gray-800 font-medium">Event: </p>
+    <p class="text-gray-500 text-sm">Time: </p>
+    <p class="text-gray-500 text-sm">Location: </p>
+  </div>
+</div>
+
+      <div class="w-px bg-gray-300 mx-2 my-4 self-stretch"></div>
+      <div class="w-1/2 pl-4 flex flex-col">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Upcoming Events</h3>
+      <div id = "Upcoming" class="grid gap-4 max-h-[60vh] overflow-y-auto">
+        <!-- Event Card -->
+        <div class="event-card bg-gray-100 p-4 rounded-lg flex justify-between items-center">
+          <div class="flex items-center gap-3">
+            <!-- Calendar Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <div>
+              <p class="text-gray-800 font-medium">Loading...</p>
+              <p class="text-gray-500 text-sm">Loading...</p>
+            </div>
+          </div>
+         
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Frame 3: Multiple Events -->
+<div class="col-span-2 row-span-1 bg-white p-4 rounded-2xl shadow-deep flex flex-col space-y-4 h-full">
+
+  <!-- 🌫️ Glassmorphic Navigation Tabs -->
+  <div class="relative flex justify-center mb-6">
+    <div class="backdrop-blur-md bg-white/40 border border-white/30 rounded-full p-1 flex shadow-lg">
+      <button
+        class="graph-btn active px-6 py-2 text-sm font-medium rounded-full transition-all duration-300 
+               bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md scale-105"
+        data-target="graph1">
+        Attendance 
+      </button>
+      <button
+        class="graph-btn px-6 py-2 text-sm font-medium rounded-full transition-all duration-300 
+               text-gray-700 hover:shadow-md hover:scale-105"
+        data-target="graph2">
+        DEPARTMENT
+      </button>
+      <button
+        class="graph-btn px-6 py-2 text-sm font-medium rounded-full transition-all duration-300 
+               text-gray-700 hover:shadow-md hover:scale-105"
+        data-target="graph3">
+        ORGANIZER
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 Graph Container -->
+  <div class="relative w-full h-[40vh] overflow-hidden rounded-xl">
+    <canvas id="graph1" class="graph absolute inset-0 opacity-100 translate-x-0 transition-all duration-700 ease-in-out"></canvas>
+    <canvas id="graph2" class="graph absolute inset-0 opacity-0 translate-x-full transition-all duration-700 ease-in-out"></canvas>
+<!-- Graph 3 + Event Cards -->
+<div id="graph3Container" class="graph absolute inset-0 opacity-0 translate-x-full transition-all duration-700 ease-in-out p-4 overflow-auto">
+
+  <!-- Event Cards Container -->
+  <div id="graph3Events" class="grid gap-3 max-h-[50vh] overflow-y-auto">
+    <!-- Event cards injected via JS -->
+    <div class="event-card bg-gray-100 p-4 rounded-lg flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <!-- Calendar Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        <div>
+          <p class="text-gray-800 font-medium">Loading...</p>
+          <p class="text-gray-500 text-sm">Loading...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  </div>
+</div>
+
+ <!-- Participants Card -->
+<div class="col-span-1 row-span-1 bg-white rounded-2xl shadow-deep flex flex-col items-center justify-center relative overflow-hidden">
+  <svg class="absolute top-0 left-0 w-full h-full opacity-50" viewBox="0 0 900 600" preserveAspectRatio="none">
+    <g transform="translate(900, 0)">
+      <path d="M0 486.7C-70 481.1 -140 475.5 -180.2 435.1C-220.4 394.8 -230.8 319.8 -277.9 277.9C-325 236 -408.8 227.1 -449.7 186.3C-490.6 145.5 -488.7 72.7 -486.7 0L0 0Z" fill="#f5f5f5"/>
+    </g>
+    <g transform="translate(0, 600)">
+      <path d="M0 -486.7C48.2 -439.9 96.4 -393 154.6 -373.2C212.8 -353.5 281 -360.9 334.5 -334.5C388 -308 426.8 -247.7 449.7 -186.3C472.6 -124.9 479.7 -62.4 486.7 0L0 0Z" fill="#f5f5f5"/>
+    </g>
+  </svg>
+
+  <div class="relative z-10 flex flex-col items-center text-center">
+    <div class="flex items-center gap-2 mb-2 text-gray-700">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 19.5a8.25 8.25 0 0115 0"/>
+      </svg>
+      <h2 class="text-lg font-semibold">Present</h2>
+    </div>
+
+    <!-- Morning Attendance -->
+    <div class="flex gap-6 mb-4">
+      <div class="flex flex-col items-center">
+        <div id="totalMorningIn" class="text-2xl font-bold text-green-600">00</div>
+        <span class="text-xs text-gray-500">Morning In</span>
+      </div>
+      <div class="flex flex-col items-center">
+        <div id="totalMorningOut" class="text-2xl font-bold text-yellow-600">00</div>
+        <span class="text-xs text-gray-500">Morning Out</span>
+      </div>
+    </div>
+
+    <!-- Afternoon Attendance -->
+    <div class="flex gap-6 mb-2">
+      <div class="flex flex-col items-center">
+        <div id="totalAfternoonIn" class="text-2xl font-bold text-blue-600">00</div>
+        <span class="text-xs text-gray-500">Afternoon In</span>
+      </div>
+      <div class="flex flex-col items-center">
+        <div id="totalAfternoonOut" class="text-2xl font-bold text-red-600">00</div>
+        <span class="text-xs text-gray-500">Afternoon Out</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  </main>
+</div>
+
+<!-- Modal for event details -->
+<div id="eventModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-2xl p-6 w-96 max-h-[80vh] overflow-y-auto shadow-lg relative">
+    <h2 class="text-xl font-semibold text-gray-700 mb-4" id="modalTitle">Event Details</h2>
+    <div id="modalContent" class="text-gray-800 space-y-2">
+      <!-- Dynamic content filled by JS -->
+    </div>
+    <div class="flex justify-end mt-4">
+      <button id="closeEventModal" class="px-3 py-1 rounded bg-gray-300 text-gray-700 hover:bg-gray-400">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Custom Script -->
+<script src="js/login.js"></script>
+<script src="js/script.js"></script>
+<script type="module">
+const SUPABASE_URL = "https://zovmjxdfmzhxetopmpyp.supabase.co";
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpvdm1qeGRmbXpoeGV0b3BtcHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwMDI3NzcsImV4cCI6MjA3NTU3ODc3N30.SNyLbhhUi6HRmTW4ThoJBYImdwcKuSykcgRzHg0TYxM";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+console.log("🚀 Supabase client initialized.");
+
+// ================================
+// Load Today's Schedule (Attendance)
+// ================================
+async function loadTodaysSchedule() {
+  const scheduleBox = document.getElementById("scheduleBox");
+  if (!scheduleBox) return;
+
+  try {
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+
+    const { data, error } = await supabase
+      .from("event")
+      .select("EventName, EventDetails, MorningIn, MorningOut, AfternoonIn, AfternoonOut, Start, End")
+      .lte("Start", todayStr)
+      .gte("End", todayStr)
+      .order("id", { ascending: false });
+
+    if (error) {
+      console.error(error);
+      scheduleBox.innerHTML = `<p class="text-red-500">Error loading event.</p>`;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      scheduleBox.innerHTML = `<p class="text-gray-500">There are no current events today! 😊</p>`;
+      return;
+    }
+
+    const ev = data[0];
+
+    const toMinutes = (time) => {
+      if (!time) return null;
+      const [h, m] = time.split(":").map(Number);
+      return h * 60 + m; // seconds are ignored
+    };
+
+    const formatTime = (t) => {
+      if (!t) return "—";
+      const [h, m] = t.split(":").map(Number);
+      const ampm = h >= 12 ? "PM" : "AM";
+      const hour = h % 12 || 12;
+      return `${hour}:${m.toString().padStart(2, "0")} ${ampm}`; // no seconds
+    };
+
+    const times = [
+      { label: "Morning In", value: ev.MorningIn },
+      { label: "Morning Out", value: ev.MorningOut },
+      { label: "Afternoon In", value: ev.AfternoonIn },
+      { label: "Afternoon Out", value: ev.AfternoonOut },
+    ];
+
+    const colorMap = {
+      "Morning In": "text-green-500",
+      "Morning Out": "text-orange-500",
+      "Afternoon In": "text-blue-500",
+      "Afternoon Out": "text-red-500",
+    };
+
+    const updateAttendance = () => {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes(); // ignore seconds
+      console.log(`⏱ Current time: ${now.getHours()}:${now.getMinutes()} (${currentMinutes} minutes)`);
+
+      // Determine next schedule whose +30 mins hasn't passed
+      let nextAttendance = null;
+      for (const t of times) {
+        const mins = toMinutes(t.value);
+        if (mins !== null && currentMinutes <= mins + 30) {
+          nextAttendance = t;
+          break;
+        }
+      }
+
+      // If all schedules passed +30 mins, pick last one
+      if (!nextAttendance) nextAttendance = times[times.length - 1];
+
+      console.log(`➡ Next attendance: ${nextAttendance.label} ${nextAttendance.value}`);
+
+      // Attendance Status: open if current time is within 30 mins of this schedule
+      let statusHTML = `<span class="text-red-700 font-semibold">Closed</span>`;
+      const scheduleMinutes = toMinutes(nextAttendance.value);
+      if (scheduleMinutes !== null && currentMinutes >= scheduleMinutes && currentMinutes <= scheduleMinutes + 30) {
+        statusHTML = `<span class="text-green-700 font-semibold">Open</span>`;
+      }
+
+      console.log(`❌ Attendance status: ${statusHTML.replace(/<[^>]+>/g, "")}`);
+
+      const attendanceHTML = `<span class="${colorMap[nextAttendance.label] || "text-gray-500"}">${nextAttendance.label} (${formatTime(nextAttendance.value)})</span>`;
+
+      scheduleBox.innerHTML = `
+        <p class="text-gray-800 font-semibold leading-[2.2]">Event: ${ev.EventName}</p>
+        <p class="text-gray-500 text-sm leading-[2.2]">
+          Attendance Time: <span id="attendanceTimes">${attendanceHTML}</span>
+        </p>
+        <p class="text-gray-500 text-sm leading-[2]">
+          Attendance Status: <span id="attendanceStatus">${statusHTML}</span>
+        </p>
+        <p class="text-gray-500 text-sm leading-[2]">Location: ${ev.EventDetails || "No details provided."}</p>
+      `;
+    };
+
+    updateAttendance(); // Initial load
+    setInterval(updateAttendance, 60000); // Refresh every 1 minute
+  } catch (err) {
+    console.error("🔥 Unexpected error in loadTodaysSchedule():", err);
+  }
+}
+
+loadTodaysSchedule();
+
+// ================================
+// Load Upcoming Events
+// ================================
+async function loadUpcomingEvents() {
+  const upcomingBox = document.getElementById("Upcoming");
+  if (!upcomingBox) return;
+
+  try {
+    console.log("⏳ Fetching upcoming events from Supabase...");
+    const { data, error } = await supabase
+      .from("event")
+      .select("EventName, EventDetails, Organizer, Start, End")
+      .order("Start", { ascending: true });
+
+    if (error) {
+      console.error("❌ Supabase error:", error);
+      upcomingBox.innerHTML = `<p class="text-red-500">Error loading upcoming events.</p>`;
+      return;
+    }
+
+    console.log("✅ Events fetched:", data);
+
+    if (!data || data.length === 0) {
+      console.log("ℹ️ No upcoming events found.");
+      upcomingBox.innerHTML = `<p class="text-gray-500">No upcoming events! 😊</p>`;
+      return;
+    }
+
+    const updateEvents = () => {
+      const now = new Date();
+      const todayStart = new Date(now);
+      todayStart.setHours(0, 0, 0, 0);
+      const todayEnd = new Date(now);
+      todayEnd.setHours(23, 59, 59, 999);
+
+      console.log("📅 Updating events for today:", now.toLocaleDateString());
+
+      upcomingBox.innerHTML = ""; // Clear previous cards
+
+      const colorMap = {
+        green: ["text-green-600", "bg-green-600", "hover:bg-green-700"],
+        orange: ["text-orange-600", "bg-orange-600", "hover:bg-orange-700"]
+      };
+     
+     
+  data.forEach((ev) => {
+  const startDate = new Date(ev.Start); // keep full timestamp
+  const endDate = new Date(ev.End);     // keep full timestamp
+
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayEnd = new Date();
+  todayEnd.setHours(23, 59, 59, 999);
+
+  console.log(`Processing event: ${ev.EventName}, Start: ${startDate.toLocaleDateString()}, End: ${endDate.toLocaleDateString()}`);
+
+  // Skip if event already ended
+  if (endDate < todayStart) {
+    console.log(`⚪ Skipping event (already ended): ${ev.EventName}, End: ${endDate.toLocaleDateString()}`);
+    return;
+  }
+
+  let color = null;
+
+  if (startDate > todayStart) {
+    color = "orange"; // not started yet
+    console.log(`🟠 Event not started yet: ${ev.EventName}`);
+  } else if (startDate <= todayStart && endDate >= todayStart) {
+    color = "green"; // already started, ongoing today
+    console.log(`🟢 Event ongoing today: ${ev.EventName}`);
+  }
+
+        const [iconColor, btnBg, btnHover] = colorMap[color];
+
+        const formatTime = (d) => {
+          const h = d.getHours();
+          const m = d.getMinutes();
+          const ampm = h >= 12 ? "PM" : "AM";
+          const hour = h % 12 || 12;
+          return `${hour}:${m.toString().padStart(2, "0")} ${ampm}`;
+        };
+
+        const card = document.createElement("div");
+        card.className = "event-card bg-gray-100 p-4 rounded-lg flex justify-between items-center";
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ${iconColor}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <div>
+              <p class="text-gray-800 font-medium">${ev.EventName}</p>
+              <p class="text-gray-500 text-sm">${formatTime(startDate)} - ${formatTime(endDate)} | ${ev.EventDetails || "No location"}</p>
+            </div>
+          </div>
+          <button class="px-3 py-1 ${btnBg} text-white text-sm rounded ${btnHover} open-event-btn">Details</button>
+        `;
+
+        // Event modal click
+        const btn = card.querySelector(".open-event-btn");
+        btn.addEventListener("click", () => {
+          const modal = document.getElementById("eventModal");
+          modal.classList.remove("hidden");
+
+          const formatDateTime = (d) => {
+            const h = d.getHours();
+            const m = d.getMinutes();
+            const ampm = h >= 12 ? "PM" : "AM";
+            const hour = h % 12 || 12;
+            return `${hour}:${m.toString().padStart(2, "0")} ${ampm} ${d.toLocaleDateString()}`;
+          };
+
+          console.log(`ℹ️ Opening modal for event: ${ev.EventName}, Start: ${startDate.toLocaleDateString()}, End: ${endDate.toLocaleDateString()}`);
+
+          document.getElementById("modalTitle").textContent = ev.EventName;
+          document.getElementById("modalContent").innerHTML = `
+            <p><strong>Organizer:</strong> ${ev.Organizer || "No organizer info"}</p>
+            <p><strong>Start: </strong> ${formatDateTime(startDate)} </p>
+            <p><strong>End: </strong> ${formatDateTime(endDate)}</p>
+            <p><strong>Location:</strong> ${ev.EventDetails || "No details provided."}</p>
+          `;
+        });
+
+        upcomingBox.appendChild(card);
+      });
+    };
+
+    updateEvents(); // Initial load
+    setInterval(updateEvents, 60000); // Refresh every minute
+
+    // Close modal button
+    const closeModal = document.getElementById("closeEventModal");
+    closeModal.addEventListener("click", () => {
+      console.log("❌ Closing event modal");
+      document.getElementById("eventModal").classList.add("hidden");
+    });
+
+  } catch (err) {
+    console.error("🔥 Unexpected error in loadUpcomingEvents():", err);
+  }
+}
+
+loadUpcomingEvents();
+
+// ================================
+// Load Total Participants for Current Date
+// ================================
+async function loadTodayAttendance() {
+  const today = new Date().toISOString().split('T')[0];
+  console.log('Today:', today);
+
+  // 1️⃣ Find the current event based on today's date
+  const { data: events, error: eventError } = await supabase
+    .from('event')
+    .select('EventName, "Start", "End"')
+    .lte('"Start"', today)    // event start <= today
+    .gte('"End"', today)      // event end >= today
+    .limit(1);
+
+  if (eventError) {
+    console.error('Error fetching event:', eventError);
+    return;
+  }
+
+  if (!events || events.length === 0) {
+    console.log('No current event today.');
+    return;
+  }
+
+  const todayEvent = events[0].EventName;
+  console.log('Today\'s Event:', todayEvent);
+
+  // 2️⃣ Fetch attendance for that event **and for today only**
+  const { data: attendanceData, error: attendanceError } = await supabase
+    .from('Attendance')
+    .select('MorningIn, MorningOut, AfternoonIn, AfternoonOut, "Date"')
+    .eq('EventName', todayEvent)
+    .eq('"Date"', today);  // filter by current date
+
+  if (attendanceError) {
+    console.error('Error fetching attendance:', attendanceError);
+    return;
+  }
+
+  console.log(`Attendance for ${today}:`, attendanceData);
+
+  // 3️⃣ Count students who have taken each attendance
+  const MorningInTotal = attendanceData.filter(row => row.MorningIn).length;
+  const MorningOutTotal = attendanceData.filter(row => row.MorningOut).length;
+  const AfternoonInTotal = attendanceData.filter(row => row.AfternoonIn).length;
+  const AfternoonOutTotal = attendanceData.filter(row => row.AfternoonOut).length;
+
+  console.log('Totals Today:', { MorningInTotal, MorningOutTotal, AfternoonInTotal, AfternoonOutTotal });
+
+  // 4️⃣ Update the DOM
+  document.getElementById('totalMorningIn').textContent = MorningInTotal.toString().padStart(2, '0');
+  document.getElementById('totalMorningOut').textContent = MorningOutTotal.toString().padStart(2, '0');
+  document.getElementById('totalAfternoonIn').textContent = AfternoonInTotal.toString().padStart(2, '0');
+  document.getElementById('totalAfternoonOut').textContent = AfternoonOutTotal.toString().padStart(2, '0');
+}
+
+// Call function on page load and every 0.5 second
+loadTodayAttendance();
+setInterval(loadTodayAttendance, 500);
+
+
+//===========================
+// PROFILE SECTION
+//===========================
+async function loadAdminProfile(adminId = 1) {
+  const img = document.getElementById("userProfileImage");
+  const defaultIcon = "images/default-profile.png";
+
+  function setImage(url) {
+    // Append timestamp to bust cache
+    img.src = url ? `${url}?t=${Date.now()}` : defaultIcon;
+  }
+
+  async function fetchProfile() {
+    try {
+      const { data: adminData, error } = await supabase
+        .from("admin")
+        .select("name, picture")
+        .eq("id", adminId)
+        .single();
+      if (error) throw error;
+
+      console.log("✅ Admin data fetched:", adminData);
+      setImage(adminData?.picture);
+    } catch (err) {
+      console.error("⚠️ Failed to fetch profile:", err);
+      setImage(defaultIcon);
+    }
+  }
+
+  // Initial fetch
+  await fetchProfile();
+
+  // Real-time subscription
+  supabase
+    .channel("public:admin")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "admin", filter: `id=eq.${adminId}` },
+      (payload) => {
+        console.log("🔔 Admin profile updated:", payload.new);
+        setImage(payload.new.picture);
+      }
+    )
+    .subscribe();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadAdminProfile();
+});
+
+
+// ==============================
+// 🎨 Graph Switching Animation + Chart Loading
+// ==============================
+const graphButtons = document.querySelectorAll(".graph-btn");
+const graphs = document.querySelectorAll(".graph");
+
+graphButtons.forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const targetId = btn.getAttribute("data-target");
+
+    // Remove active styles from all buttons
+    graphButtons.forEach((b) => {
+      b.classList.remove(
+        "bg-gradient-to-r",
+        "from-blue-600",
+        "to-blue-500",
+        "text-white",
+        "shadow-md",
+        "scale-105"
+      );
+      b.classList.add("text-gray-700");
+    });
+
+    // Activate clicked button
+    btn.classList.add(
+      "bg-gradient-to-r",
+      "from-blue-600",
+      "to-blue-500",
+      "text-white",
+      "shadow-md",
+      "scale-105"
+    );
+    btn.classList.remove("text-gray-700");
+
+    // Hide all graphs
+    graphs.forEach((g) => {
+      g.classList.add("opacity-0", "translate-x-full");
+      g.classList.remove("opacity-100", "translate-x-0");
+    });
+
+    // -----------------------------
+    // Show selected graph
+    // -----------------------------
+    let targetGraph;
+
+    if (targetId === "graph3") {
+      // Graph 3 uses container ID
+      targetGraph = document.getElementById("graph3Container");
+    } else {
+      targetGraph = document.getElementById(targetId);
+    }
+
+    if (!targetGraph) return console.warn(`Graph container not found: ${targetId}`);
+
+    targetGraph.classList.remove("opacity-0", "translate-x-full");
+    targetGraph.classList.add("opacity-100", "translate-x-0");
+
+    // -----------------------------
+    // Load data for each graph
+    // -----------------------------
+    if (targetId === "graph1") {
+      if (window.renderAttendanceChart) await window.renderAttendanceChart();
+    } else if (targetId === "graph2") {
+      await loadDepartmentAttendance();
+    } else if (targetId === "graph3") {
+      if (window.renderGraph3Cards) await window.renderGraph3Cards();
+    }
+  });
+});
+
+
+// ================================
+// GRAPH 1
+// ================================
+async function getCurrentEvent() {
+  const today = new Date().toISOString().split("T")[0];
+
+  const { data, error } = await supabaseClient
+    .from("event")
+    .select("EventName, Start, End")
+    .lte("Start", today) // Start <= today
+    .gte("End", today)   // End >= today
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error fetching current event:", error.message);
+    return null;
+  }
+  console.log("Current event:", data);
+  return data;
+}
+
+// === Fetch attendance rows for given EventName ===
+// We fetch raw rows and aggregate client-side (robust for different schemas)
+async function loadAttendanceRows(eventName) {
+  const { data, error } = await supabaseClient
+    .from("Attendance")
+    .select("Date, MorningIn, AfternoonIn") // adjust column names if different
+    .eq("EventName", eventName)
+    .order("Date", { ascending: true });
+
+  if (error) throw error;
+  console.log("Raw attendance rows:", data);
+  return data || [];
+}
+
+// === Aggregate attendance rows into per-date totals ===
+function aggregateAttendance(rows) {
+  // map: dateStr -> {morning: number, afternoon: number}
+  const map = Object.create(null);
+
+  rows.forEach(r => {
+    if (!r.Date) return;
+    // normalize date to YYYY-MM-DD
+    const dateKey = (new Date(r.Date)).toISOString().split("T")[0];
+
+    if (!map[dateKey]) map[dateKey] = { morning: 0, afternoon: 0 };
+
+    const m = r.MorningIn;
+    const a = r.AfternoonIn;
+
+    // If values are numeric (counts), sum them
+    if (typeof m === "number") {
+      map[dateKey].morning += m;
+    } else {
+      // otherwise if value exists (timestamp/boolean/string) count as 1
+      if (m !== null && m !== undefined && m !== "") map[dateKey].morning += 1;
+    }
+
+    if (typeof a === "number") {
+      map[dateKey].afternoon += a;
+    } else {
+      if (a !== null && a !== undefined && a !== "") map[dateKey].afternoon += 1;
+    }
+  });
+
+  return map;
+}
+
+
+// === Render Chart ===
+async function renderAttendanceChart() {
+  const event = await getCurrentEvent();
+  if (!event) {
+    console.warn("⚠️ No ongoing event found today.");
+    return;
+  }
+
+  // fetch raw rows and aggregate
+  const rows = await loadAttendanceRows(event.EventName);
+  const agg = aggregateAttendance(rows);
+
+  const allDates = generateDateRange(event.Start, event.End);
+
+  const morning = [];
+  const afternoon = [];
+
+  allDates.forEach(date => {
+    const v = agg[date];
+    if (v) {
+      // if aggregated values exist use them
+      morning.push(v.morning ?? 0);
+      afternoon.push(v.afternoon ?? 0);
+    } else {
+      // no rows for that date -> 0
+      morning.push(0);
+      afternoon.push(0);
+    }
+  });
+
+  console.log("Dates:", allDates);
+  console.log("Morning series:", morning);
+  console.log("Afternoon series:", afternoon);
+
+  const formattedLabels = allDates.map(d =>
+    new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+  );
+
+  const ctx = document.getElementById("graph1").getContext("2d");
+
+  // destroy previous chart if any
+  if (window.attendanceChart) window.attendanceChart.destroy();
+
+
+
+// ✅ Determine dynamic step size based on maximum attendance
+const maxValue = Math.max(...morning, ...afternoon);
+let stepSize = 1;
+
+if (maxValue > 10 && maxValue < 100) stepSize = 10;
+else if (maxValue >= 100 && maxValue < 300) stepSize = 100;
+else if (maxValue >= 300 && maxValue < 500) stepSize = 300;
+else if (maxValue >= 500 && maxValue < 1000) stepSize = 500;
+else if (maxValue >= 1000) stepSize = 1000;
+
+console.log("Y-axis step size:", stepSize);
+
+window.attendanceChart = new Chart(ctx, {
+  type: "line",
+  data: {
+    labels: formattedLabels,
+    datasets: [
+      {
+        label: "Morning Attendance",
+        data: morning,
+        borderColor: "#2563eb",
+        backgroundColor: "rgba(37,99,235,0.08)",
+        borderWidth: 3,
+        tension: 0.35,
+        fill: false,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        pointBackgroundColor: "#2563eb",
+        order: 2,
+      },
+      {
+        label: "Afternoon Attendance",
+        data: afternoon,
+        borderColor: "#f97316",
+        backgroundColor: "rgba(249,115,22,0.12)",
+        borderWidth: 3,
+        tension: 0.35,
+        fill: false,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        pointBackgroundColor: "#f97316",
+        order: 1,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: "index", intersect: false },
+    plugins: {
+      legend: { position: "bottom" },
+      title: {
+        display: true,
+        text: `${event.EventName}`,
+        padding: { top: 0, bottom: 10 },
+      },
+      tooltip: {
+        enabled: false // ❌ disables all hover labels
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: stepSize,
+          callback: function (value) {
+            if (Number.isInteger(value)) return value;
+          },
+        },
+        grid: { color: "#e5e7eb" },
+      },
+      x: {
+        ticks: { maxRotation: 0, minRotation: 0, font: { size: 11 } },
+        grid: { color: "#f3f4f6" },
+      },
+    },
+  },
+});
+}
+
+renderAttendanceChart();
+
+// === 🟢 Enable Real-time Updates ===
+supabaseClient
+  .channel('attendance-updates') // name your channel
+  .on(
+    'postgres_changes',
+    {
+      event: '*', // listen for INSERT, UPDATE, DELETE
+      schema: 'public',
+      table: 'Attendance',
+    },
+    async (payload) => {
+      console.log("🔄 Attendance change detected:", payload);
+      await renderAttendanceChart(); // re-fetch and re-render the graph
+    }
+  )
+  .subscribe();
+
+
+// =========================================
+// GRAPH 2: Attendance per Department and Year (Event-Based)
+// =========================================
+
+// 🧭 Load event-based attendance data
+async function loadDepartmentAttendance(eventName) {
+  const { data, error } = await supabaseClient
+    .from("Attendance")
+    .select("Date, Std_Department, Std_Year, MorningIn, MorningOut, AfternoonIn, AfternoonOut, EventName, Std_ID")
+    .eq("EventName", eventName)
+    .order("Date", { ascending: true });
+
+  if (error) {
+    console.error("Error loading department attendance:", error);
+    return [];
+  }
+  return data || [];
+}
+
+// 🧩 Aggregate attendance per department, date, year (unique students only)
+function aggregateDepartmentAttendanceUnique(rows, allDates) {
+  const map = new Map(); // key = date-department-year, value = Set of student IDs
+
+  rows.forEach(r => {
+    const date = new Date(r.Date).toISOString().split("T")[0];
+    const department = r.Std_Department || "Unknown";
+    const year = r.Std_Year || "N/A";
+    const key = `${date}-${department}-${year}`;
+
+    if (!map.has(key)) map.set(key, new Set());
+
+    if (r.MorningIn || r.MorningOut || r.AfternoonIn || r.AfternoonOut) {
+      map.get(key).add(r.Std_ID);
+    }
+  });
+
+  const departments = [...new Set(rows.map(r => r.Std_Department || "Unknown"))];
+  const years = [...new Set(rows.map(r => r.Std_Year || "N/A"))];
+
+  const filled = [];
+  for (const d of allDates) {
+    for (const dep of departments) {
+      for (const y of years) {
+        const key = `${d}-${dep}-${y}`;
+        filled.push({ date: d, department: dep, year: y, total: map.has(key) ? map.get(key).size : 0 });
+      }
+    }
+  }
+
+  return { data: filled, departments, years };
+}
+// 🗓️ Generate date range
+function generateDateRange(start, end) {
+  const dates = [];
+  let current = new Date(start);
+  const endDate = new Date(end);
+  while (current <= endDate) {
+    dates.push(current.toISOString().split("T")[0]);
+    current.setDate(current.getDate() + 1);
+  }
+  return dates;
+}
+// 🎨 Render chart
+async function renderDepartmentYearChart() {
+  const event = await getCurrentEvent();
+  if (!event) return;
+
+  const rows = await loadDepartmentAttendance(event.EventName);
+  const allDates = generateDateRange(event.Start, event.End);
+  const { data: agg, departments, years } = aggregateDepartmentAttendanceUnique(rows, allDates);
+
+  const colors = [
+    "#2563eb", "#f97316", "#16a34a", "#a855f7", "#dc2626",
+    "#14b8a6", "#facc15", "#8b5cf6", "#ef4444", "#10b981"
+  ];
+
+  const datasets = departments.map((department, i) => ({
+    label: department,
+    data: allDates.map(d => {
+      const records = agg.filter(a => a.department === department && a.date === d);
+      return records.reduce((sum, r) => sum + r.total, 0);
+    }),
+    backgroundColor: colors[i % colors.length],
+    borderRadius: 6,
+    barThickness: Math.max(30, 60 / departments.length),
+  }));
+
+  const ctx = document.getElementById("graph2").getContext("2d");
+  if (window.departmentYearlyChart) window.departmentYearlyChart.destroy();
+
+ window.departmentYearlyChart = new Chart(ctx, {
+  type: "bar",
+  data: {
+    labels: allDates.map(d => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" })),
+    datasets,
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: "nearest", intersect: true },
+    plugins: {
+      legend: { position: "bottom" },
+      title: { display: true, text: `${event.EventName}`, padding: { top: 0, bottom: 10 } },
+      tooltip: {
+        enabled: false // ❌ disables all hover labels
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { stepSize: 1, callback: v => Number.isInteger(v) ? v : null },
+        title: { display: true, text: "Number of Attendances", font: { weight: "600" } },
+        grid: { color: "#e5e7eb" },
+      },
+      x: {
+        ticks: { maxRotation: 0, minRotation: 0 },
+        title: { display: true, text: "Date", font: { weight: "600" } },
+        grid: { color: "#f3f4f6" },
+      },
+    },
+  },
+});
+}
+
+// 🚀 Initial render + realtime updates
+renderDepartmentYearChart();
+supabaseClient
+  .channel("department-yearly-attendance")
+  .on("postgres_changes", { event: "*", schema: "public", table: "Attendance" },
+      async () => await renderDepartmentYearChart()
+  )
+  .subscribe();
+
+
+// ================================
+// GRAPH 3
+// ================================
+async function renderGraph3Cards() {
+  const { data, error } = await supabaseClient
+    .from("event")
+    .select("EventName, Start, End, Organizer")
+    .order("Start", { ascending: true });
+
+  if (error) return console.error(error);
+
+  const container = document.getElementById("graph3Events");
+  container.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    container.innerHTML = `<p class="text-gray-500 text-center">No events found.</p>`;
+    return;
+  }
+
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  data.forEach(ev => {
+    const startDate = new Date(ev.Start);
+    const endDate = new Date(ev.End);
+    const startDateStr = startDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const endDateStr = endDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+    // Determine status
+    let color = "";
+    let icon = "";
+    if (startDate > todayStart) {
+      color = "orange"; // upcoming
+      icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>`; // clock icon
+    } else if (startDate <= todayStart && endDate >= todayStart) {
+      color = "green"; // ongoing
+      icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>`; // checkmark icon
+    } else if (endDate < todayStart) {
+      color = "red"; // finished
+      icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>`; // X/cross icon
+    }
+
+    const card = document.createElement("div");
+    card.className = `event-card bg-gray-100 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-200 transition border-l-4 border-${color}-500`;
+
+    card.innerHTML = `
+      <div class="flex items-center gap-3">
+        ${icon}
+        <div>
+          <p class="text-gray-800 font-medium">${ev.EventName}</p>
+          <p class="text-gray-500 text-sm">${startDateStr} - ${endDateStr}</p>
+          <p class="text-gray-500 text-sm">Organizer: ${ev.Organizer}</p>
+        </div>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+
+// Initial render & auto-update
+renderGraph3Cards();
+supabaseClient
+  .channel("event-updates")
+  .on("postgres_changes", { event: "*", schema: "public", table: "event" }, async () => {
+    await renderGraph3Cards();
+  })
+  .subscribe();
+
+
+</script>
+
+</body>
+</html>
